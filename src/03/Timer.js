@@ -7,21 +7,9 @@ import { useMachine } from '@xstate/react';
 import { ProgressCircle } from '../ProgressCircle';
 
 import { timerMachine } from './timerMachine';
-import { assign } from 'xstate';
-
-const tick = assign({
-  elapsed: (context) => context.elapsed + context.interval
-});
-const addMinute = assign({
-  duration: (context) => context.duration + 60,
-});
-const reset = assign({
-  duration: 60,
-  elapsed: 0,
-})
 
 export const Timer = () => {
-  const [state, send] = useMachine(timerMachine, { actions: {tick, addMinute, reset} });
+  const [state, send] = useMachine(timerMachine);
 
   const { duration, elapsed, interval } = state.context;
 

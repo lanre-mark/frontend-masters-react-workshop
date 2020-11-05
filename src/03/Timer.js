@@ -7,14 +7,33 @@ import { useMachine } from '@xstate/react';
 import { ProgressCircle } from '../ProgressCircle';
 
 import { timerMachine } from './timerMachine';
+import { assign } from 'xstate';
+
+const tick = assign({
+  elapsed: (context) => context.elapsed + context.interval
+});
+const addMinute = assign({
+  duration: (context) => context.duration + 60,
+});
+const reset = assign({
+  duration: 60,
+  elapsed: 0,
+})
 
 export const Timer = () => {
-  const [state, send] = useMachine(timerMachine);
+  const [state, send] = useMachine(timerMachine, { actions: {tick, addMinute, reset} });
 
   const { duration, elapsed, interval } = state.context;
 
   // Add a useEffect(...) here to send a TICK event on every `interval`
   // ...
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      send('TICK');
+    }, interval * 1000);
+
+    return () => clearInterval(intervalId);
+  }, [state.value]);
 
   return (
     <div
